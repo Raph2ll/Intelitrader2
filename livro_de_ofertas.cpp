@@ -6,111 +6,113 @@
 
 using namespace std;
 
-struct Oferta {
-    int posicao;
-    double valor;
-    int quantidade;
+struct Offer {
+    double value;
+    int quantity;
 };
 
-vector<Oferta> ofertas;
+vector<Offer> offers;
 
-bool verificarRepeticao(int posicao) {
-    for (const Oferta& oferta : ofertas) {
-        if (oferta.posicao == posicao) {
-            return true;
-        }
-    }
-    return false;
+bool isValidIndex(int index) {
+    return index >= 0 && index < offers.size();
 }
 
-void inserir(int posicao, double valor, int quantidade) {
-    if (verificarRepeticao(posicao)) {
-        cout << "Ação repetida. Não será inserida novamente." << endl;
-        return; 
+void insert(int position, double value, int quantity) {
+    int index = position - 1; // Convert to 0-based index
+
+    // Verifica se o vetor offers é grande o suficiente para conter a posição index. 
+    while (offers.size() <= index) {
+        offers.push_back({0, 0});
     }
 
-    Oferta novaOferta = { posicao, valor, quantidade };
-    ofertas.push_back(novaOferta);
-}
-
-void modificar(int posicao, double novoValor, int novaQuantidade) {
-    for (auto& oferta : ofertas) {
-        if (oferta.posicao == posicao) {
-            oferta.valor = novoValor;
-            oferta.quantidade = novaQuantidade;
-            return;
-        }
+    if (offers[index].value != 0 || offers[index].quantity != 0) {
+        cout << "Repeated action. It will not be inserted again." << endl;
+        return;
     }
-    cout << "Oferta com posição " << posicao << " não encontrada." << endl;
+
+    offers[index] = {value, quantity};
 }
 
-void deletar(int posicao) {
-    auto it = ofertas.begin();
-    while (it != ofertas.end()) {
-        if (it->posicao == posicao) {
-            it = ofertas.erase(it);
-        } else {
-            ++it;
-        }
+void modify(int position, double newValue, int newQuantity) {
+    int index = position - 1; // Convert to 0-based index
+
+    if (!isValidIndex(index)) {
+        cout << "Offer with position " << position << " not found." << endl;
+        return;
     }
+    
+    offers[index].value = newValue;
+    offers[index].quantity = newQuantity;
 }
 
-void imprimirOfertas() {
-    for (const Oferta& oferta : ofertas) {
-        cout << oferta.posicao << "," << oferta.valor << "," << oferta.quantidade << endl;
+void erase(int position) {
+    int index = position - 1; // Convert to 0-based index
+
+    if (!isValidIndex(index)) {
+        cout << "Offer with position " << position << " not found." << endl;
+        return;
+    }
+
+    // Insert a placeholder {0, 0} instead of erasing the element
+    offers[index] = {0, 0};
+}
+
+void printOffers() {
+    for (size_t i = 0; i < offers.size(); ++i) {
+        cout << (i + 1) << "," << offers[i].value << "," << offers[i].quantity << endl; // Convert back to 1-based position
     }
 }
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        cerr << "Uso: " << argv[0] << " <número de notificações> <notificações...>" << endl;
+        cerr << "Usage: " << argv[0] << " <number of notifications> <offers...>" << endl;
         return 1;
     }
 
-    int numNotificacoes;
+    int numNotifications;
     try {
-        numNotificacoes = stoi(argv[1]);
+        numNotifications = stoi(argv[1]);
     } catch (const invalid_argument& e) {
-        cerr << "Número de notificações inválido." << endl;
+        cerr << "Invalid number of notifications." << endl;
         return 1;
     }
 
     for (int i = 2; i < argc; ++i) {
         stringstream ss(argv[i]);
         string token;
-        vector<string> parametros;
+        vector<string> parameters;
 
         while (getline(ss, token, ',')) {
-            parametros.push_back(token);
+            parameters.push_back(token);
         }
-
-        if (parametros.size() != 4) {
-            cerr << "Formato de notificação inválido: " << argv[i] << endl;
+        
+        if (parameters.size() != 4) {
+            cerr << "Invalid notification format: " << argv[i] << endl;
             continue;
         }
 
-        int posicao = stoi(parametros[0]);
-        int acao = stoi(parametros[1]);
-        double valor = stod(parametros[2]);
-        int quantidade = stoi(parametros[3]);
+        int position = stoi(parameters[0]);
+        int action = stoi(parameters[1]);
+        double value = stod(parameters[2]);
+        int quantity = stoi(parameters[3]);
 
-        switch (acao) {
+        switch (action) {
             case 0:
-                inserir(posicao, valor, quantidade);
+                insert(position, value, quantity);
                 break;
             case 1:
-                modificar(posicao, valor, quantidade);
+                modify(position, value, quantity);
                 break;
             case 2:
-                deletar(posicao);
+                erase(position);
                 break;
             default:
-                cerr << "Ação inválida: " << acao << endl;
+                cerr << "Invalid action: " << action << endl;
                 break;
         }
     }
 
-    imprimirOfertas();
+    printOffers();
 
     return 0;
 }
