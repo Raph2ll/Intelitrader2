@@ -1,4 +1,4 @@
-#Boas vindas ao repositório do desafio da Intelitrader
+# Boas vindas ao repositório do desafio da Intelitrader
 ## Instrução
 
 Compile e execute.
