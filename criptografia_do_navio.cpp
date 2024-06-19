@@ -24,10 +24,7 @@ string binaryToAscii(const string &binaryStr)
     for (char bit : binaryStr)
     {
         chr <<= 1;
-        if (bit == '1')
-        {
-            chr |= 1;
-        }
+        chr |= (bit - '0');
 
         ++bitCount;
         if (bitCount == 8)
